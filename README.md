@@ -24,4 +24,4 @@ Users can search, download JSON files, and automate communication through email 
 
 ### 📸 System Architecture / Demo
 
-![AutoParse System Architecture](./images/autoparse-diagram.png)
+![AutoParse System Architecture](./images/architecture.png)
