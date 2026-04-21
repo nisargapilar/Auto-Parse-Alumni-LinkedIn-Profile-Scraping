@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Project Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+    }
+
+    .card {
+      width: 360px;
+      padding: 40px 30px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.7s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    input:focus {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    input::placeholder {
+      color: #e5e5e5;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #fff;
+      color: #0072ff;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: #eaeaea;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    #message {
+      min-height: 20px;
+      margin-top: 8px;
+      font-size: 14px;
+      color: #ffd9d9;
+    }
+
+    p {
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    a {
+      color: #fff;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    a:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Welcome Back 👋</h2>
+
+    <!-- ✅ This form submits to Flask's login route -->
+    <form method="POST" action="/">
+      <input name="username" type="text" placeholder="Username" required />
+      <input name="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+
+    {% if message %}
+      <p id="message">{{ message }}</p>
+    {% endif %}
+
+    <!-- ✅ Flask route instead of static file -->
+    <p>New here? <a href="/signup">Create an account</a></p>
+  </div>
+</body>
+</html>

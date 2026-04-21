@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Account</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 350px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      animation: fade 0.8s ease;
+      color: #fff;
+      text-align: center;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    input::placeholder {
+      color: #ececec;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: #fff;
+      color: #4e54c8;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.25s;
+    }
+
+    button:hover {
+      background: #ececec;
+    }
+
+    a {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    #message {
+      min-height: 20px;
+      margin-top: 5px;
+      font-size: 14px;
+      color: #ffd9d9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Create Account</h2>
+
+    <!-- Form sends data to Flask backend -->
+    <form method="POST" action="/signup">
+      <input name="username" type="text" placeholder="Username" required />
+      <input name="password" type="password" placeholder="Password (min 6 chars)" required />
+      <input name="confirm_password" type="password" placeholder="Confirm Password" required />
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <p id="message">{{ message|safe }}</p>
+
+    <p style="margin-top:10px">
+      Already have an account? <a href="/">Login</a>
+    </p>
+  </div>
+</body>
+</html>

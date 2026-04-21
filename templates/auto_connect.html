@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+  <title>AutoConnect</title>
+  <style>
+    :root {
+      --accent: #0077b5;
+      --accent-dark: #005f8d;
+      --text: #033047;
+      --card-bg: rgba(255,255,255,0.85);
+      --danger: #dc3545;
+      --success: #28a745;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 20px 20px;
+      background-image:
+        repeating-linear-gradient(
+            135deg,
+            rgba(255,255,255,0.03) 0px,
+            rgba(255,255,255,0.03) 8px,
+            rgba(0,0,0,0.05) 8px,
+            rgba(0,0,0,0.05) 16px
+        ),
+        linear-gradient(135deg, #5ba9e5 0%, #3087cf 50%, #116cb7 100%);
+    }
+/* SEARCH BAR (fixed, won't affect anything else) */
+#search-container {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  max-width: 800px;
+  padding: 10px;
+  background: var(--accent);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  z-index: 999;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: white;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    h2 {
+      text-align: center;
+      color: white;
+      margin: 20px 0 30px;
+    }
+    
+    .card { 
+      background: var(--card-bg); 
+      padding: 30px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1); 
+      margin-bottom: 20px; 
+      width: 100%;
+    }
+    
+    .btn { 
+      padding: 10px 18px; 
+      background: var(--accent); 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 10px; 
+      font-weight: 600;
+    }
+    
+    .btn:hover { 
+      background: var(--accent-dark); 
+    }
+    
+    .btn:disabled { 
+      background: #cccccc; 
+      cursor: not-allowed; 
+    }
+    
+    .flash { 
+      padding: 12px; 
+      margin-bottom: 20px; 
+      border-radius: 8px; 
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    .flash.success { 
+      background-color: rgba(212, 237, 218, 0.9); 
+      color: #155724; 
+    }
+    
+    .flash.danger { 
+      background-color: rgba(248, 215, 218, 0.9); 
+      color: #721c24; 
+    }
+    
+    .no-email { 
+      color: var(--danger); 
+      font-style: italic; 
+    }
+    
+    input[type="file"], textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    
+    label {
+      font-weight: 600;
+      margin-top: 15px;
+      display: block;
+    }
+    
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s, transform 0.2s, opacity 0.3s;
+      z-index: 1000;
+    }
+    
+    .back-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* hides search bar on scroll */
+#search-container.hide-search {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+
+  </style>
+</head>
+
+<body>
+
+<a href="/dashboard" class="back-btn" id="backBtn">⬅ Back</a>
+
+<!-- SEARCH BAR -->
+<div id="search-container">
+  <input type="text" id="searchInput" placeholder="Search profiles by name, email, designation...">
+</div>
+
+<div class="container">
+  <h2>AutoConnect Profiles</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% for p in profiles %}
+  <div class="card profile-card">
+    <h3>{{ p.fullName or p.profile_name }}</h3>
+    
+    <p><b>Email:</b> 
+      {% if p.emails and p.emails[0] %}
+        {{ p.emails[0] }}
+      {% else %}
+        <span class="no-email">No email available</span>
+      {% endif %}
+    </p>
+    
+    <p><b>Designation:</b> {{ p.designation or 'Not specified' }}</p>
+    
+    {% if p.headline %}
+    <p><b>Headline:</b> {{ p.headline }}</p>
+    {% endif %}
+
+    {% if p.emails and p.emails[0] %}
+    <form action="{{ url_for('auto_connect.send_email', profile_id=p.id) }}" method="POST" enctype="multipart/form-data">
+      <label><b>Upload Resume (PDF, DOC, DOCX - max 5MB):</b></label>
+      <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+
+      <label><b>Your message:</b></label>
+      <textarea name="message" rows="4" required>
+Dear {{ p.fullName or p.profile_name }},
+
+I came across your profile and would appreciate your guidance on career opportunities in {{ p.designation or 'your field' }}.
+
+Looking forward to connecting with you.
+
+Best regards,
+{{ session.get('user', 'Aspiring Professional') }}
+      </textarea>
+
+      <button class="btn" type="submit">Send Connection Request</button>
+    </form>
+    {% else %}
+    <p style="color: var(--danger); font-style: italic;">
+      Cannot send email - no email address available for this profile.
+    </p>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="card">
+    <p>No profiles found.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+const backBtn = document.getElementById('backBtn');
+const searchContainer = document.getElementById('search-container');
+const searchInput = document.getElementById('searchInput');
+const profileCards = document.querySelectorAll('.profile-card');
+
+let lastScrollTop = 0;
+
+window.addEventListener('scroll', function() {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (scrollTop > lastScrollTop && scrollTop > 120) {
+    backBtn.classList.add('hidden');
+    searchContainer.classList.add('hide-search');
+  } else {
+    backBtn.classList.remove('hidden');
+    searchContainer.classList.remove('hide-search');
+  }
+  lastScrollTop = scrollTop;
+});
+
+searchInput.addEventListener('input', function() {
+  const keyword = this.value.toLowerCase();
+
+  profileCards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.style.display = text.includes(keyword) ? 'block' : 'none';
+  });
+});
+</script>
+
+</body>
+</html>

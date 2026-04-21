@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Search Alumni</title>
+
+<style>
+    :root {
+        --accent: #0077b5;
+        --accent-dark: #005f8d;
+        --text: #033047;
+        --bg: #eef6ff;
+        --card-bg: rgba(255,255,255,0.9);
+    }
+
+    body.dark {
+        --text: #e5e5e5;
+        --bg: #1e1e1e;
+        --card-bg: #2a2a2a;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma;
+        background: var(--bg);
+        padding: 40px;
+        margin: 0;
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    h2 { color: var(--accent); }
+
+    .toggle-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        background: var(--accent);
+        border: none;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        padding: 8px 16px;
+        background: var(--accent-dark);
+        border: none;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    form {
+        background: var(--card-bg);
+        padding: 16px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    input { padding: 12px; width: 300px; }
+    button {
+        padding: 12px 20px;
+        background: var(--accent);
+        color:white;
+        border:none;
+        border-radius: 8px;
+        cursor:pointer;
+    }
+
+    .card {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        width: 90%;
+        max-width: 850px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: transform 0.15s;
+    }
+    .card:hover { transform: scale(1.02); }
+
+    .profile-row {
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+    }
+
+    .profile-row img {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent);
+    }
+
+    .field { margin: 8px 0; }
+    .key { font-weight: bold; color: var(--accent-dark); }
+
+    .position-block {
+        background: rgba(0,0,0,0.05);
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin: 12px 0;
+    }
+
+    .pos-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--accent-dark);
+    }
+
+    .pos-meta {
+        font-size: 14px;
+        margin-top: 3px;
+        color: #555;
+    }
+
+    .pos-desc {
+        margin-top: 8px;
+        white-space: pre-line;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .highlight {
+        background: yellow;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+</style>
+</head>
+
+<body>
+
+<a href="/dashboard" class="back-btn">⬅ Back</a>
+<button class="toggle-btn" onclick="toggleDark()">🌙 Dark Mode</button>
+
+<script>
+function toggleDark() {
+    document.body.classList.toggle("dark");
+}
+</script>
+
+<h2>🔍 Alumni Search</h2>
+
+<form method="POST" action="/search">
+    <input type="text" name="keyword" placeholder="Search keyword..." required>
+    <button type="submit">Search</button>
+</form>
+
+{% if results %}
+<h3 style="color:var(--accent);">Results for “{{ keyword }}”</h3>
+
+{% for r in results %}
+<div class="card">
+    <div class="profile-row">
+        {% if r.data.photoUrl %}
+            <img src="{{ r.data.photoUrl }}" alt="Profile Photo">
+        {% else %}
+            <img src="https://cdn-icons-png.flaticon.com/512/848/848006.png">
+        {% endif %}
+
+        <div>
+            <div class="field"><span class="key">Name:</span> {{ r.data.fullName|default("N/A") }}</div>
+            <div class="field"><span class="key">Headline:</span> {{ r.data.headline|default("N/A") }}</div>
+            <div class="field"><span class="key">Location:</span> {{ r.data.location|default("N/A") }}</div>
+
+            {% if r.data.profileUrl %}
+                <div class="field">
+                    <span class="key">LinkedIn:</span>
+                    <a href="{{ r.data.profileUrl }}" target="_blank">View Profile</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    {% if r.data.positions %}
+    <div class="field">
+        <span class="key">Positions:</span>
+        {% for p in r.data.positions %}
+        <div class="position-block">
+            <div class="pos-title">{{ p.title|default("No Title") }}</div>
+            <div class="pos-meta">
+                📍 {{ p.location|default("Unknown") }} <br>
+                🕒 {{ p.startDate|default("N/A") }} — {{ p.endDate|default("Present") }} <br>
+                🏢 <b>{{ p.company|default("N/A") }}</b>
+            </div>
+            {% if p.description %}
+            <div class="pos-desc">{{ p.description }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% for key, value in r.data.items() %}
+        {% if value not in ["", [], {}]
+           and key not in ["fullName", "headline", "location", "profileUrl", "photoUrl", "positions"] %}
+        <div class="field">
+            <span class="key">{{ key }}:</span><br>
+            {% if value is mapping %}
+                <pre>{{ value | pprint }}</pre>
+            {% elif value is sequence and not value is string %}
+                {% for v in value %}
+                    • {{ v }}<br>
+                {% endfor %}
+            {% else %}
+                {{ value }}
+            {% endif %}
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endfor %}
+{% endif %}
+
+<script>
+let keyword = "{{ keyword }}".toLowerCase();
+if (keyword) {
+    document.querySelectorAll("body *").forEach(el => {
+        if (el.children.length === 0 && el.textContent.toLowerCase().includes(keyword)) {
+            el.innerHTML = el.innerHTML.replace(
+                new RegExp(keyword, "gi"),
+                match => `<span class='highlight'>${match}</span>`
+            );
+        }
+    });
+}
+</script>
+
+</body>
+</html>

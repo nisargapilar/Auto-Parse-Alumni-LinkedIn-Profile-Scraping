@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+
+# Env files
+.env
+.env.*
+
+# Secrets
+serviceAccountKey.json
+
+# OS
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Scrap files (LinkedIn data)
+*_files/
+input/
+saved_profiles/
+
+# Ignore specific data files (NOT all JSON)
+linkedin_profile_data.json
+
+# Ignore notebooks checkpoints
+.ipynb_checkpoints/
+
+# Optional: large files
+*.pptx
